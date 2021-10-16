@@ -1,7 +1,6 @@
-
 ;;; go-back-buffer.el --- Visit the previous buffer in a window  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018  william.wedler
+;; Copyright (C) 2018-2021  william.wedler
 
 ;; Author: William Wedler <wwedler@riseup.net>
 ;; Version: 0.0.1
@@ -10,6 +9,25 @@
 ;; This file is NOT part of GNU Emacs.
 
 ;;; Commentary:
+
+;; go-back-buffer is a package to provides a minor mode and
+;; interactive function for easily switching to the most recently
+;; visited buffer in the active window. Think of it like alt+tab for
+;; buffer switching.
+
+;; Installation and Setup:
+;; Install go-back-buffer from MELPA, or download it manually from GitHub. If
+;; you download manually, add these lines to your init file:
+;;    (add-to-list 'load-path "/path/to/go-back-buffer")
+;;    (require 'go-back-buffer)
+;; To activate Purpose at start-up, add this line to your init file:
+;;    (go-back-buffer-mode)
+;; Recommended key binding: bind a function key to 'gbb-display-prev-buffer
+;;    (global-set-key (kbd "<f1>") 'gbb--display-prev-buffer)
+
+;; Basic Usage:
+;; 1. Switch to the most recently viewed buffer in the given window
+;;    `gbb--display-prev-buffer'
 
 ;;; License:
 
@@ -135,15 +153,33 @@ for compatibility with advice."
     (window-start window)
     (window-point window))))
 
+(defun gbb--add-advices ()
+    "Add all advices needed for go-back-buffer to work.
+This function is called when `go-back-buffer-mode' is activated."
+  (advice-add 'set-window-buffer :before 'gbb--update-history)
+  (advice-add 'delete-window :before 'gbb--cleanup-history))
+
+(defun gbb--remove-advices ()
+    "Remove all advices needed for Purpose to work.
+This function is called when `go-back-buffer-mode' is deactivated."
+    (advice-remove 'set-window-buffer :before 'gbb--update-history)
+  (advice-remove 'delete-window :before 'gbb--cleanup-history))
+
+;;;###autoload
 (defun gbb--display-prev-buffer ()
   "Toggle to the previous buffer in the current window"
   (interactive)
   (gbb--display-prev-buffer-in-window))
 
-; (advice-add 'set-window-buffer :before 'gbb--update-history)
-; (advice-add 'delete-window :before 'gbb--cleanup-history)
-; (advice-remove 'set-window-buffer #'gbb--update-history)
-
+;;;###autoload
+(define-minor-mode go-back-buffer-mode nil
+  :global t
+  (if go-back-buffer-mode
+      (progn
+        (gbb--add-advices)
+        (setq gbb--active-p t))
+    (gbb--remove-advices)
+    (setq gbb--active-p nil)))
 
 (provide 'go-back-buffer)
 
