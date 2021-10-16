@@ -13,7 +13,7 @@ Install go-back-buffer from MELPA, or download it manually from GitHub. If you d
 (require 'go-back-buffer)
 ```
 
-To activate Purpose at start-up, add this line to your init file:
+To activate go-back-buffer at start-up, add this line to your init file:
 
 ```
 (go-back-buffer-mode)
