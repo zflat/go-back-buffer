@@ -5,6 +5,8 @@
 ;; Author: William Wedler <wwedler@riseup.net>
 ;; Version: 0.0.1
 ;; Keywords: convenience, window
+;; URL: https://github.com/zflat/go-back-buffer
+;; Package-Requires: ((emacs "24.4"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -180,7 +182,7 @@ This function is called when `go-back-buffer-mode' is deactivated."
   (advice-remove 'delete-window #'gbb--cleanup-history))
 
 ;;;###autoload
-(defun gbb--display-prev-buffer ()
+(defun display-prev-buffer-in-window ()
   "Toggle to the previous buffer in the current window."
   (interactive)
   (gbb--display-prev-buffer-in-window))
