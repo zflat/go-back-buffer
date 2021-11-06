@@ -2,7 +2,7 @@
 
 ## Introduction
 
-go-back-buffer is a package that provides a minor mode and interactive function for easily switching to the most recently visited buffer in the active window. Think of it like Alt+Tab for buffers in emacs windows.
+go-back-buffer is a package that provides a minor mode and interactive function for easily switching to the most recently visited buffer in the active window. Think of it like a single key-press "Alt+Tab" for buffers in emacs windows.
 
 ## Installation and Setup:
 
