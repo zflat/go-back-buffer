@@ -109,12 +109,14 @@ for compatibility with advice."
    (lambda (history)
      (let* ((win-obj (gbb--history-window history))
             (screen-ref (gbb--history-screen history)))
-       (if(or
-           (not (and (fboundp 'elscreen-get-conf-list)
-                     (member
-                      screen-ref
-                      (elscreen-get-conf-list 'screen-history))))
-           (not (window-valid-p win-obj)))
+       (if (and
+            (not (eq window win-obj))
+            (or
+             (not (and (fboundp 'elscreen-get-conf-list)
+                       (member
+                        screen-ref
+                        (elscreen-get-conf-list 'screen-history))))
+             (not (window-valid-p win-obj))))
            (put 'gbb--prev-history 'history
                 (delq
                  history
