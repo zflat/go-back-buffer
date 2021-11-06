@@ -110,9 +110,10 @@ for compatibility with advice."
      (let* ((win-obj (gbb--history-window history))
             (screen-ref (gbb--history-screen history)))
        (if(or
-           (not (member
-                 screen-ref
-                 (elscreen-get-conf-list 'screen-history)))
+           (not (and (fboundp 'elscreen-get-conf-list)
+                     (member
+                      screen-ref
+                      (elscreen-get-conf-list 'screen-history))))
            (not (window-valid-p win-obj)))
            (put 'gbb--prev-history 'history
                 (delq
@@ -167,20 +168,22 @@ Argument BUFFER is used as the entry's value."
 (defun gbb--add-advices ()
     "Add all advices needed for go-back-buffer to work.
 This function is called when `go-back-buffer-mode' is activated."
-  (advice-add 'set-window-buffer :before 'gbb--update-history)
-  (advice-add 'delete-window :before 'gbb--cleanup-history))
+  (advice-add 'set-window-buffer :before #'gbb--update-history)
+  (advice-add 'delete-window :before #'gbb--cleanup-history))
 
 (defun gbb--remove-advices ()
     "Remove all advices needed for Purpose to work.
 This function is called when `go-back-buffer-mode' is deactivated."
-    (advice-remove 'set-window-buffer :before 'gbb--update-history)
-  (advice-remove 'delete-window :before 'gbb--cleanup-history))
+    (advice-remove 'set-window-buffer #'gbb--update-history)
+  (advice-remove 'delete-window #'gbb--cleanup-history))
 
 ;;;###autoload
 (defun gbb--display-prev-buffer ()
   "Toggle to the previous buffer in the current window."
   (interactive)
   (gbb--display-prev-buffer-in-window))
+
+(defvar gbb--active-p nil)
 
 ;;;###autoload
 (define-minor-mode go-back-buffer-mode nil
