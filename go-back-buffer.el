@@ -12,12 +12,12 @@
 
 ;; go-back-buffer is a package to provides a minor mode and
 ;; interactive function for easily switching to the most recently
-;; visited buffer in the active window. Think of it like alt+tab for
+;; visited buffer in the active window.  Think of it like alt+tab for
 ;; buffer switching.
 
 ;; Installation and Setup:
-;; Install go-back-buffer from MELPA, or download it manually from GitHub. If
-;; you download manually, add these lines to your init file:
+;; install go-back-buffer from MELPA, or download it manually from GitHub.
+;; If you download manually, add these lines to your init file:
 ;;    (add-to-list 'load-path "/path/to/go-back-buffer")
 ;;    (require 'go-back-buffer)
 ;; To activate Purpose at start-up, add this line to your init file:
@@ -50,7 +50,7 @@
 
 
 (defun gbb--prev-history (&optional window)
-  "Get or set the history entry for the given window"
+  "Get or set the history entry for the given WINDOW."
   (let* ((curr-window (or window (selected-window)))
          (curr-buffer (window-buffer curr-window))
          (curr-screen (if (fboundp 'elscreen-get-current-screen) (elscreen-get-current-screen) "0"))
@@ -65,8 +65,9 @@
      (gbb--history-key curr-screen curr-window)
      (get 'gbb--prev-history 'history))))
 
-(defun gbb--update-history (&optional window next-buffer)
-  "Store the previous buffer in history"
+(defun gbb--update-history (&optional window)
+  "Store the window's current buffer in the previous buffer.
+Optional argument WINDOW overrides the default, `selected-window', to get the current buffer of the window."
   (let* ((curr-window (or window (selected-window)))
          (curr-buffer (window-buffer curr-window))
          (prev-history (gbb--prev-history curr-window)))
@@ -83,7 +84,7 @@
                 (window-point curr-window)))))))
 
 (defun gbb--display-prev-buffer-in-window (&optional window)
-  "Toggle to the previous buffer in WINDOW"
+  "Toggle to the previous buffer in WINDOW."
   (let* ((curr-window (or window (selected-window)))
          (curr-buffer (window-buffer curr-window))
          (prev-history (gbb--prev-history curr-window)))
@@ -102,7 +103,7 @@
 (defun gbb--cleanup-history (&optional window)
   "Clean up buffer history.
 Delete the buffer history for any window that is no longer valid
-or for screens that no longer exist.  Argument WINDOW provided
+or for screens that no longer exist.  Argument WINDOW is provided
 for compatibility with advice."
   (mapcar
    (lambda (history)
@@ -121,10 +122,11 @@ for compatibility with advice."
 
 ;; Maintaining state
 ;; (http://ergoemacs.org/emacs/elisp_toggle_command.html)
-; (get 'gbb--prev-history 'history)
-; (put 'gbb--prev-history 'history nil)
 (defun gbb--history-key (screen window)
-  "Object used as the alist key"
+  "Object used as the alist key in the buffer history list.
+Argument SCREEN is the elscreen screen object used for the list
+entry key.  Argument WINDOW is the window object used for the list
+entry key"
   (list screen window))
 (defun gbb--history-window (item)
   "The window object in the alist element ITEM."
@@ -132,8 +134,14 @@ for compatibility with advice."
 (defun gbb--history-screen (item)
   "The screen referenced in the alist element ITEM."
   (nth 0 (car item)))
-(defun gbb--history-val (buffer win-start  win-point)
-  "Object used as the alist val"
+(defun gbb--history-val (buffer win-start win-point)
+  "Object used as the alist val in the buffer history list.
+Argument BUFFER is the buffer to return to when visiting this
+history entry.
+Argument WIN-START is the starting line of the window to return
+to when visiting the history entry.
+Argument WIN-POINT is the location of point to return to when
+visiting the history entry."
   (list buffer win-start win-point))
 (defun gbb--history-buffer (item)
   "Get the buffer stored in the alist element ITEM."
@@ -145,7 +153,10 @@ for compatibility with advice."
   "Get the window point stored in the alist element ITEM."
   (nth 2 (car (cdr item))))
 (defun gbb--history-item (screen window buffer)
-  "Key-val pair used for the alist element"
+  "Key-val pair used for the alist element in the buffer history list.
+Argument SCREEN is used for the entry's key.
+Argument WINDOW is used for the entry's key.
+Argument BUFFER is used as the entry's value."
   (list
    (gbb--history-key screen window)
    (gbb--history-val
@@ -167,7 +178,7 @@ This function is called when `go-back-buffer-mode' is deactivated."
 
 ;;;###autoload
 (defun gbb--display-prev-buffer ()
-  "Toggle to the previous buffer in the current window"
+  "Toggle to the previous buffer in the current window."
   (interactive)
   (gbb--display-prev-buffer-in-window))
 
