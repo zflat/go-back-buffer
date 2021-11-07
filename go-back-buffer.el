@@ -67,14 +67,16 @@
      (gbb--history-key curr-screen curr-window)
      (get 'gbb--prev-history 'history))))
 
-(defun gbb--update-history (&optional window)
+(defun gbb--update-history (&optional window next-buffer)
   "Store the window's current buffer in the previous buffer.
-Optional argument WINDOW overrides the default, `selected-window', to get the current buffer of the window."
+Optional argument WINDOW overrides the default, `selected-window', to get the current buffer of the window.
+Optional argument NEXT-BUFFER is checked against the current buffer to prevent duplicate consecutive history entries."
   (let* ((curr-window (or window (selected-window)))
          (curr-buffer (window-buffer curr-window))
          (prev-history (gbb--prev-history curr-window)))
     (if (and
          (buffer-live-p curr-buffer)
+         (not (equal next-buffer curr-buffer))
          (not (equal
                (gbb--history-buffer prev-history)
                curr-buffer)))
@@ -182,7 +184,7 @@ This function is called when `go-back-buffer-mode' is deactivated."
   (advice-remove 'delete-window #'gbb--cleanup-history))
 
 ;;;###autoload
-(defun display-prev-buffer-in-window ()
+(defun gbb-display-prev-buffer ()
   "Toggle to the previous buffer in the current window."
   (interactive)
   (gbb--display-prev-buffer-in-window))
